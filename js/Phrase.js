@@ -1,6 +1,8 @@
 /* Treehouse FSJS Techdegree
  * Project 4 - OOP Game App
- * Phrase.js */
+ * Phrase.js 
+ * Author James Hanley
+ * */
 
  class Phrase {
 
@@ -20,6 +22,7 @@
         }
     }
 
+    //return the number of non space characters in the selected phrase
     getPhraseLetterCount() {
         if(this.#thePhrase != null) {
             const length = this.#thePhrase.length;
@@ -37,6 +40,7 @@
         return 0;
     }
 
+    //when a new game starts, update the page for the new phrase
     addPhraseToDisplay() {
         let div = document.getElementById('phrase');
         div.innerHTML = '';
@@ -64,6 +68,9 @@
 
     }
 
+    //function checkLetter
+    //@Param letter: check to see if the user has selected a letter thats in the phrase
+    //returns number correct letters found in the phrase, so we can add up correct answers in the game.
     checkLetter(letter) {
         this.#chosenLetter = '';
 
@@ -88,6 +95,7 @@
         return 0;
     }
 
+    //if we get a correct letter chosen, update the game to reveal that letter
     showMatchedLetter() {
         const length = this.#listElements.length;
 
