@@ -4,6 +4,8 @@
  * Author James Hanley
  * */
 
+ const phrases = ['love everyone', 'fun times', 'game time', 'party on', 'to victory'];
+
  class Phrase {
 
     //store the phrase passed to the constructor
@@ -14,12 +16,14 @@
     //these are created and then stored here when addPhraseToDisplay is called
     #listElements;
 
-    constructor(init_phrase) {
-        if(init_phrase != null && typeof(init_phrase) === 'string') {
-            this.#thePhrase = init_phrase.toLowerCase();
-            this.#chosenLetter = '';
-            this.#listElements = [];
-        }
+    constructor() {
+        //create a random index, from 0 to length
+        var random = Math.floor(Math.random() * phrases.length);
+        //store the chosen phrase
+        this.#thePhrase = phrases[random];
+
+        this.#chosenLetter = '';
+        this.#listElements = [];
     }
 
     //return the number of non space characters in the selected phrase

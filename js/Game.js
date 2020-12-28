@@ -10,8 +10,8 @@
     #missed;
     //the randomly selected phrase for this game session
     #activePhrase;
-    //the phrases this game will randomize from
-    #phrases;        
+    //the phrase objects this game will hold
+    #phraseObjects;        
     //holds the selected letter from the user, used when checking for win
     #userChosenLetter;
     //the start screen overlay
@@ -20,8 +20,9 @@
     #correctAnswers;
 
     constructor() {
-        
-        this.#phrases = ['love everyone', 'fun times', 'game time', 'party on', 'to victory'];  
+        this.#missed = 0;
+        this.#activePhrase = null;
+        this.#phraseObjects = [new Phrase(), new Phrase(), new Phrase(), new Phrase(), new Phrase()];
         this.#startOverlay = document.getElementById('overlay');
     }
 
@@ -32,10 +33,8 @@
         this.#missed = 0;
         //reset the user chosen letters
         this.#userChosenLetter = '';
-        //chose a new random phrase
-        var phrase = this.#getRandomPhrase();
         //create a new phrase object
-        this.#activePhrase = new Phrase(phrase);
+        this.#activePhrase = this.#getRandomPhrase();
         //hide overlay
         this.#startOverlay.style.display = 'none'; 
 
@@ -45,9 +44,9 @@
     //Gets a random phrase from the prases list, and returns it
     #getRandomPhrase() {
         //create a random index, from 0 to length
-        var random = Math.floor(Math.random() * this.#phrases.length);
+        var random = Math.floor(Math.random() * this.#phraseObjects.length);
         //store the chosen phrase
-        var phrase = this.#phrases[random];
+        var phrase = this.#phraseObjects[random];
         //return the phrase
         return phrase;
     }
@@ -61,28 +60,25 @@
             selectedButton.disabled = true;
             
             //lets see if we chose a letter that is in the chosen phrase
-            let isCorrect = this.#activePhrase.checkLetter(this.#userChosenLetter);
+            let correctChoices = this.#activePhrase.checkLetter(this.#userChosenLetter);
             //update the buttons styling based on correct answer, true if greater than 0
-            selectedButton.className = (isCorrect > 0 ? "chosen" : "wrong");
+            selectedButton.className = (correctChoices > 0 ? "chosen" : "wrong");
 
-            if(isCorrect > 0) {
+            if(correctChoices > 0) {
                 //increment correct answers
-                this.#correctAnswers += isCorrect;
-
+                this.#correctAnswers += correctChoices;
                 //show the matched letter
                 this.#activePhrase.showMatchedLetter();
-                //see if we won
-                this.checkForWin();
             }
             else {
                 //we got it wrong, remove a life
                 this.removeLife();
-                //increment misses
-                this.#missed += 1;
-                //if we miss 5, the game is over
-                if(this.#missed === 5) {
-                    this.gameOver(false);
-                }
+            }
+
+            let won = this.checkForWin();
+
+            if(won) {
+                this.gameOver(true);
             }
         }
     }
@@ -98,6 +94,13 @@
         let tries = ol.getElementsByClassName('tries');
         //update the innerHTML so that it uses the lostheart.png
         tries[removeElement].innerHTML = `<img src="images/lostHeart.png" alt="Heart Icon" height="35" width="30">`;
+
+        //increment misses
+        this.#missed += 1;
+        //if we miss 5, the game is over
+        if(this.#missed === 5) {
+            this.gameOver(false);
+        }
     }
 
     //evaluate if the player has won the game yet, if so, call game over
@@ -106,10 +109,8 @@
         let count = this.#activePhrase.getPhraseLetterCount();     
         //as long as we have not lost the game, and we have the correct answer count
         let won = (this.#missed < 5 && this.#correctAnswers === count);
-            
-        if(won) {
-            this.gameOver(true);
-        }
+        
+        return won;
     }
 
     //private function to reset the keyboard, called when the game is over
@@ -147,6 +148,9 @@
         //show the overlay, and update the class and style based on winner
         this.#startOverlay.className = (winner ? "win" : "lose");
         this.#startOverlay.style.display = 'block';
+
+        let gameOverElement = document.getElementById("game-over-message");
+        gameOverElement.textContent = (winner ? "You Won!" : "You Lost!");
 
         //reset the keyboard
         this.#resetKeyboard();
